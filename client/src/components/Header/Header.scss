@@ -1,0 +1,24 @@
+@import url("https://fonts.googleapis.com/css2?family=Oswald:wght@400;500&family=Poppins:wght@100&family=Raleway:wght@200&display=swap");
+
+.jumbotron {
+  &__heading {
+    display: flex;
+    h1 {
+      color: white;
+      font-family: "Oswald", sans-serif;
+      font-size: 1.5rem;
+    }
+  }
+
+  &__tagLine {
+    font-family: "Poppins", sans-serif;
+    color: white;
+    font-size: 2.5rem;
+
+    &--des {
+      font-family: "Raleway", sans-serif;
+      color: white;
+      font-size: 1.2rem;
+    }
+  }
+}
