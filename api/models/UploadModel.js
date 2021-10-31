@@ -1,26 +1,31 @@
-const mongoose = require('mongoose');
-const Schema = new mongoose.Schema({
-    name: {
-        type: String,
-        trim: true,
-        require: true
-    },
+const mongoose = require("mongoose");
+const uploadSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    trim: true,
+    required: true,
+  },
 
-    mimeType: {
-        type: String,
-        require: true
-    },
+  size: {
+    type: Number,
+    required: true,
+  },
 
-    size: {
-        type: Number,
-        require: true
-    },
+  createdAt: {
+    type: Date,
+    required: true,
+  },
 
-    createdAt: {
-        type: Date,
-        require: true
-    }
-
+  userId: {
+    type: mongoose.Schema.ObjectId,
+    ref: "User",
+  },
 });
 
-module.exports = mongoose.model('ImageData', Schema);
+
+// uploadSchema.pre("save", function (next) {
+//   this.populate({ path: "userId"});
+//   next();
+// });
+
+module.exports = mongoose.model("Upload", uploadSchema);

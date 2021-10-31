@@ -3,9 +3,10 @@ const router = express.Router();
 const uploadController = require("../controllers/UploadController");
 
 router.post(
-  '/upload',
+  '/uploads',
   uploadController.uploadSingle,
-  uploadController.resizeImg,
+  uploadController.storingFiles,
+  uploadController.fileMetaData,
   uploadController.upload
 );
 

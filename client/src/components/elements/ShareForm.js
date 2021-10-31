@@ -1,16 +1,41 @@
 import React, { Component } from "react";
 import { Field, reduxForm } from "redux-form";
+import axios from "axios";
+import JSZip from "jszip";
+import { connect } from "react-redux";
+import { compose } from "redux";
 import Button from "./Button";
 import styled from "styled-components";
+import Dropzone from "./Dropzone";
 
 const FormWrap = styled.form`
   width: ${(props) => props.width};
   padding: ${(props) => props.padding};
 `;
-
+const zip = new JSZip();
 class ShareForm extends Component {
-  submit = (formValues) => {
-    console.log(formValues);
+  submit = async (formValues) => {
+    const fn = zip.folder("files");
+    const files = Array.from(this.props.files);
+    files.forEach((f) => fn.file(f.name, f));
+
+    const content = await zip.generateAsync({ type: "blob" });
+    const file = new File([content], "file.zip");
+    const form = new FormData();
+
+    form.append("file", file);
+    form.append("info", formValues);
+
+    await axios.post(`http://localhost:4000/api/v1/users`, {
+      info: formValues,
+    });
+    
+    const { data } = await axios.post(
+      `http://localhost:4000/api/v1/store/uploads`,
+      form
+    );
+
+    console.log(data);
   };
   renderForm({ input, label, textArea, placeholder, meta }) {
     const className = `field ${meta.error && meta.touched ? "error" : ""}`;
@@ -51,24 +76,26 @@ class ShareForm extends Component {
   render() {
     return (
       <FormWrap
-        onSubmit={this.props.handleSubmit(this.submit)}
+        action="http://localhost:4000/api/v1/store/upload"
         className="ui form error"
+        onSubmit={this.props.handleSubmit(this.submit)}
         {...this.props}
       >
+        <Dropzone height="8rem" />
         <Field
-          name="SendTo"
+          name="sendTo"
           component={this.renderForm}
           label="Send To"
           placeholder="Email address"
         />
         <Field
-          name="From"
+          name="from"
           component={this.renderForm}
           label="From"
           placeholder="Your email address"
         />
         <Field
-          name="Message"
+          name="message"
           component={this.renderForm}
           label="Message"
           placeholder="Add a message (optional)"
@@ -99,28 +126,32 @@ const validateEmail = (email) => {
   return false;
 };
 
-const validator = (formValues) => {
-  const errors = {};
-  if (!formValues.SendTo) {
-    errors.SendTo = "Please enter the sender 's email address";
-  }
+// const validator = (formValues) => {
+//   const errors = {};
+//   if (!formValues.SendTo) {
+//     errors.SendTo = "Please enter the sender 's email address";
+//   }
 
-  if (!formValues.From) {
-    errors.From = "Please enter your email address";
-  }
+//   if (!formValues.From) {
+//     errors.From = "Please enter your email address";
+//   }
 
-  if (formValues.SendTo && validateEmail(formValues.SendTo)) {
-    errors.SendTo = "Sender 's email is invalid . Make sure its correct";
-  }
+//   if (formValues.SendTo && validateEmail(formValues.SendTo)) {
+//     errors.SendTo = "Sender 's email is invalid . Make sure its correct";
+//   }
 
-  if (formValues.From && validateEmail(formValues.From)) {
-    errors.From = "Your email is invalid . Make sure its correct";
-  }
+//   if (formValues.From && validateEmail(formValues.From)) {
+//     errors.From = "Your email is invalid . Make sure its correct";
+//   }
 
-  return errors;
+//   return errors;
+// };
+
+const mapStateToProps = (state) => {
+  return { files: state.files };
 };
 
-export default reduxForm({
-  form: "ShareForm",
-  validate: validator,
-})(ShareForm);
+export default compose(
+  connect(mapStateToProps),
+  reduxForm({ form: "ShareForm" })
+)(ShareForm);
