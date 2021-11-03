@@ -21,6 +21,8 @@ const schema = new mongoose.Schema({
     type: String,
     trim: true,
   },
+
+  createdAt: Date,
 });
 
 module.exports = mongoose.model("User", schema);

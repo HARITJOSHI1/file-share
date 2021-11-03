@@ -1,28 +1,33 @@
 const nodemailer = require("nodemailer");
+const User = require("../models/UserModel");
 
 module.exports = class Email {
-  constructor(user, file){
-    this.user = user; 
-    this.file = file; 
+  constructor(ffile, file) {
+    this.file = file;
+    this.ffile = ffile;
   }
-  
+
+  async init () {
+    this.user = await User.findById({ _id: this.file.userId });
+  }
+
   newTransport() {
     return nodemailer.createTransport({
-      service: 'SendGrid',
+      service: "SendGrid",
       auth: {
         user: process.env.SENDGRID_USERNAME,
-        pass: process.env.SENDGRID_PASSWORD
-      }
+        pass: process.env.SENDGRID_PASSWORD,
+      },
     });
   }
 
-  async send(template, subject){
-    console.log(this.file);
+  async send(subject) {
+    await this.init();
     const mailOptions = {
-      from: this.user.email,
+      from: this.user.from,
       to: this.user.sendTo,
       subject,
-      text: template,
+      text: this.user.message
     };
 
     this.newTransport().sendMail(mailOptions);

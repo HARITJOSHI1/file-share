@@ -11,7 +11,6 @@ class App extends Component {
         <Router history={history}>
           <Switch>
             <Route exact path="/" component={Header} />
-            <Route exact path="/dropdown" component={Dropzone} />
           </Switch>
         </Router>
       </>

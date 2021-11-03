@@ -1,17 +1,29 @@
 const catchAsync = require("../utils/catchAsync");
-const superagent = require("superagent");
-const { finder } = require("../utils/finder");
+
+exports.get = (Model) =>
+  catchAsync(async (req, res, next, user) => {
+    const _id = req.params.id;
+    const data = await Model.findOne({ _id });
+    if (res) {
+      res.status(200).json({
+        status: "success",
+        results: data?.length || 1,
+        data,
+      });
+    }
+    else {
+      user.data = data;
+    };
+  });
 
 exports.post = (Model) =>
   catchAsync(async (req, res) => {
-    // console.log("handler func " + req.body.info.sendTo);
     await Model.create(req.body);
-    const num = await Model.countDocuments();
-    await Model.find({})
-      .populate({ path: "userId", select: "_id" });
 
-    res.status(200).json({
-      status: "success",
-      message: `Uploaded successfully`,
-    });
+    if (res) {
+      res.status(200).json({
+        status: "success",
+        message: `Uploaded successfully`,
+      });
+    }
   });

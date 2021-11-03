@@ -37,10 +37,11 @@ const Dropzone = (props) => {
           flexDirection: "column",
           border: "2px dashed #bdbebf",
           borderRadius: '2px',
+          padding: '2rem 0',
           cursor: 'pointer'
         }}
       >
-        <i style={{ width: "40%", height: "40%", marginBottom: '1rem', color: '#8f97b5' }}>
+        <i style={{ width: "15%", height: "15%", marginBottom: '1rem', color: '#8f97b5' }}>
           {" "}
           <GoFileSymlinkFile style={{ width: "100%", height: "100%" }} />
         </i>

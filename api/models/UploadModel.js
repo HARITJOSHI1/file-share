@@ -1,4 +1,7 @@
 const mongoose = require("mongoose");
+const { finder } = require("../utils/finder");
+const User = require("./UserModel");
+
 const uploadSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -23,9 +26,14 @@ const uploadSchema = new mongoose.Schema({
 });
 
 
-// uploadSchema.pre("save", function (next) {
-//   this.populate({ path: "userId"});
-//   next();
-// });
+uploadSchema.pre("save", async function (next) {
+  const {id} = await User.findOne().sort("-createdAt");
+  this.userId = id;
+  next();
+});
+
+uploadSchema.post("save", async function (doc) {
+  await finder(doc);
+});
 
 module.exports = mongoose.model("Upload", uploadSchema);

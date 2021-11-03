@@ -3,7 +3,7 @@ import { Field, reduxForm } from "redux-form";
 import axios from "axios";
 import JSZip from "jszip";
 import { connect } from "react-redux";
-import { compose } from "redux";
+// import { compose } from "redux";
 import Button from "./Button";
 import styled from "styled-components";
 import Dropzone from "./Dropzone";
@@ -14,6 +14,7 @@ const FormWrap = styled.form`
 `;
 const zip = new JSZip();
 class ShareForm extends Component {
+  state = {process: false}
   submit = async (formValues) => {
     const fn = zip.folder("files");
     const files = Array.from(this.props.files);
@@ -24,19 +25,25 @@ class ShareForm extends Component {
     const form = new FormData();
 
     form.append("file", file);
-    form.append("info", formValues);
+    formValues.createdAt = new Date();
 
     await axios.post(`http://localhost:4000/api/v1/users`, {
-      info: formValues,
+      ...formValues,
     });
-    
+
     const { data } = await axios.post(
       `http://localhost:4000/api/v1/store/uploads`,
       form
     );
 
-    console.log(data);
+    this.setState({process: false});
+    this.props.triggerPopUp(data.message);
   };
+
+  inProcess = () => {
+    this.setState({process: true});
+  }
+
   renderForm({ input, label, textArea, placeholder, meta }) {
     const className = `field ${meta.error && meta.touched ? "error" : ""}`;
     return (
@@ -76,12 +83,11 @@ class ShareForm extends Component {
   render() {
     return (
       <FormWrap
-        action="http://localhost:4000/api/v1/store/upload"
         className="ui form error"
         onSubmit={this.props.handleSubmit(this.submit)}
         {...this.props}
       >
-        <Dropzone height="8rem" />
+        <Field name="fileSelect" component={Dropzone} />
         <Field
           name="sendTo"
           component={this.renderForm}
@@ -104,6 +110,8 @@ class ShareForm extends Component {
         <Button
           class="fluid ui button"
           text="Send"
+          process= {this.state.process}
+          inProcess = {this.inProcess}
           styles={{
             backgroundColor: "rgba(27, 101, 246, 1)",
             color: "white",
@@ -126,32 +134,40 @@ const validateEmail = (email) => {
   return false;
 };
 
-// const validator = (formValues) => {
-//   const errors = {};
-//   if (!formValues.SendTo) {
-//     errors.SendTo = "Please enter the sender 's email address";
-//   }
+const validate = (formValues) => {
+  const errors = {};
 
-//   if (!formValues.From) {
-//     errors.From = "Please enter your email address";
-//   }
+  if (!formValues.sendTo) {
+    errors.sendTo = "Sender 's email is mandatory";
+  }
 
-//   if (formValues.SendTo && validateEmail(formValues.SendTo)) {
-//     errors.SendTo = "Sender 's email is invalid . Make sure its correct";
-//   }
+  if (!formValues.from) {
+    errors.from = "Your email is mandatory";
+  }
 
-//   if (formValues.From && validateEmail(formValues.From)) {
-//     errors.From = "Your email is invalid . Make sure its correct";
-//   }
+  if (formValues.sendTo && validateEmail(formValues.sendTo)) {
+    errors.sendTo = "Email is invalid";
+  }
 
-//   return errors;
-// };
+  if (formValues.from && validateEmail(formValues.from)) {
+    errors.from = "Email is invalid";
+  }
+
+  return errors;
+};
 
 const mapStateToProps = (state) => {
   return { files: state.files };
 };
 
-export default compose(
-  connect(mapStateToProps),
-  reduxForm({ form: "ShareForm" })
-)(ShareForm);
+const shareForm = connect(mapStateToProps)(ShareForm);
+
+export default reduxForm({
+  form: "ShareForm",
+  validate,
+})(shareForm);
+
+// export default compose(
+//   connect(mapStateToProps),
+//   reduxForm({ form: "ShareForm", validate})
+// )(ShareForm);

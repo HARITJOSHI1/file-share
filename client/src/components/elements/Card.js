@@ -13,7 +13,7 @@ export const Card = styled.div`
     @media screen and (max-width: 75em){
         width: 50%;
     }
-
+    
     @media screen and (max-width: 56.25em){
         width: 60%;
     }
