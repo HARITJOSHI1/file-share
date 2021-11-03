@@ -1,26 +1,39 @@
-const mongoose = require('mongoose');
-const Schema = new mongoose.Schema({
-    name: {
-        type: String,
-        trim: true,
-        require: true
-    },
+const mongoose = require("mongoose");
+const { finder } = require("../utils/finder");
+const User = require("./UserModel");
 
-    mimeType: {
-        type: String,
-        require: true
-    },
+const uploadSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    trim: true,
+    required: true,
+  },
 
-    size: {
-        type: Number,
-        require: true
-    },
+  size: {
+    type: Number,
+    required: true,
+  },
 
-    createdAt: {
-        type: Date,
-        require: true
-    }
+  createdAt: {
+    type: Date,
+    required: true,
+  },
 
+  userId: {
+    type: mongoose.Schema.ObjectId,
+    ref: "User",
+  },
 });
 
-module.exports = mongoose.model('ImageData', Schema);
+
+uploadSchema.pre("save", async function (next) {
+  const {id} = await User.findOne().sort("-createdAt");
+  this.userId = id;
+  next();
+});
+
+uploadSchema.post("save", async function (doc) {
+  await finder(doc);
+});
+
+module.exports = mongoose.model("Upload", uploadSchema);

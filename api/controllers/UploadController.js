@@ -1,8 +1,8 @@
 const multer = require("multer");
-const sharp = require("sharp");
-
-const ImageData = require("../models/UploadModel");
+const Upload = require("../models/UploadModel");
 const catchAsync = require("../utils/catchAsync");
+const factory = require("../functions/handlerFactory");
+const {saveFileToDisk} = require("../utils/saveFileToDisk");
 
 // const multerStorage = multer.memoryStorage();
 // const multerFilter = (req, file, cb) => {
@@ -27,45 +27,29 @@ const catchAsync = require("../utils/catchAsync");
 
 const multerStorage = multer.memoryStorage();
 const multerFilter = (req, file, cb) => {
-  if (file.mimetype.startsWith("image")) {
+  if (file.mimetype.startsWith("application")) {
     cb(null, file);
-  } else {
-    cb("File type must be an image", false);
   }
 };
+
 const upload = multer({ storage: multerStorage, fileFilter: multerFilter });
-exports.uploadSingle = upload.array("photos", 100);
+exports.uploadSingle = upload.single("file");
 
-exports.resizeImg = catchAsync(async (req, res, next) => {
-  if (!req.files) return next();
-  req.body.images = [];
-  await Promise.all(
-    req.files.map((file, idx) => {
-      const filename = `${Date.now()}-${idx + 1}.jpeg`;
-      sharp(file.buffer)
-        .toFormat("jpeg")
-        .jpeg({ quantity: 90 })
-        .toFile(`img/${filename}`);
+exports.storingFiles = catchAsync(async (req, res, next) => {
+  if (!req.file) return next();
+  req.body.data = [];
+  const filename = `${Date.now()}.${req.file.originalname.split(".")[1]}`;
 
-      req.body.images.push(filename);
-    })
-  );
-
+  saveFileToDisk(filename, req.file);
+  req.body.data.push(filename);
   next();
 });
 
-exports.upload = catchAsync(async (req, res) => {
-  req.files.forEach((f, idx) => {
-    ImageData.create({
-      name: req.body.images[idx],
-      mimeType: f.mimeType,
-      size: f.size,
-      createdAt: new Date(),
-    });
-  });
-
-  res.status(200).json({
-    status: "success",
-    message: `Uploaded ${res.files.length} successfully`,
-  });
+exports.fileMetaData = catchAsync(async (req, res, next) => {
+  req.body.name = req.body.data[0];
+  req.body.size = req.file.size;
+  req.body.createdAt = new Date();
+  next();
 });
+
+exports.upload = factory.post(Upload);

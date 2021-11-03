@@ -1,24 +1,51 @@
 @import url("https://fonts.googleapis.com/css2?family=Oswald:wght@400;500&family=Poppins:wght@100&family=Raleway:wght@200&display=swap");
+@import "../../scss/mixins/mixin";
+
+.sec-1{
+  height: 170vh;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+
+  @include Responsive(tab-land) {
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+    height: 100%;
+  }
+
+  @include Responsive(tab-port) {
+    height: 100%;
+  }
+
+  @include Responsive(phone) {
+    height: 100%;
+  }
+}
 
 .jumbotron {
   &__heading {
+    @include FontEdit("Oswald", white, 2.3rem);
     display: flex;
-    h1 {
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+
+    &--icon {
       color: white;
-      font-family: "Oswald", sans-serif;
-      font-size: 1.5rem;
+      margin-right: 0.5rem;
+      height: 60%;
     }
   }
 
-  &__tagLine {
-    font-family: "Poppins", sans-serif;
-    color: white;
-    font-size: 2.5rem;
+  &__tagline {
+    @include FontEdit("Poppins", white, 4.5rem);
+    letter-spacing: -2px;
+    margin-bottom: 0.6rem;
+  }
 
-    &--des {
-      font-family: "Raleway", sans-serif;
-      color: white;
-      font-size: 1.2rem;
-    }
+  &--des {
+    @include FontEdit("Raleway", rgba(231, 231, 231, 0.753), 1.6rem);
   }
 }
