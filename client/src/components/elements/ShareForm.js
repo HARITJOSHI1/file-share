@@ -3,7 +3,6 @@ import { Field, reduxForm } from "redux-form";
 import axios from "axios";
 import JSZip from "jszip";
 import { connect } from "react-redux";
-// import { compose } from "redux";
 import Button from "./Button";
 import styled from "styled-components";
 import Dropzone from "./Dropzone";
@@ -14,8 +13,9 @@ const FormWrap = styled.form`
 `;
 const zip = new JSZip();
 class ShareForm extends Component {
-  state = {process: false}
+  state = {process: false};
   submit = async (formValues) => {
+    this.setState({process: true});
     const fn = zip.folder("files");
     const files = Array.from(this.props.files);
     files.forEach((f) => fn.file(f.name, f));
@@ -41,7 +41,7 @@ class ShareForm extends Component {
   };
 
   inProcess = () => {
-    this.setState({process: true});
+    if(this.state.process) this.setState({process: true});
   }
 
   renderForm({ input, label, textArea, placeholder, meta }) {

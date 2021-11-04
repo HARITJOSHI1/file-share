@@ -23,5 +23,5 @@ exports.post = (Model) =>
         status: "success",
         message: `Uploaded successfully`,
       });
-    }, 1000 * 8);
+    }, 1000 * 4);
   });
