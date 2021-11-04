@@ -10,20 +10,18 @@ exports.get = (Model) =>
         results: data?.length || 1,
         data,
       });
-    }
-    else {
+    } else {
       user.data = data;
-    };
+    }
   });
 
 exports.post = (Model) =>
   catchAsync(async (req, res) => {
     await Model.create(req.body);
-
-    if (res) {
+    setTimeout(() => {
       res.status(200).json({
         status: "success",
         message: `Uploaded successfully`,
       });
-    }
+    }, 1000 * 8);
   });
