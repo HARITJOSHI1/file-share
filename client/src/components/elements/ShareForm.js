@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, createRef } from "react";
 import { Field, reduxForm } from "redux-form";
 import axios from "axios";
 import JSZip from "jszip";
@@ -14,7 +14,13 @@ const FormWrap = styled.form`
 const zip = new JSZip();
 class ShareForm extends Component {
   state = {process: false};
+
   submit = async (formValues) => {
+    if(!this.props.files.length){
+      this.props.triggerPopUp("Error, must add atleast 1 file");
+      return;
+    }
+
     this.setState({process: true});
     const fn = zip.folder("files");
     const files = Array.from(this.props.files);

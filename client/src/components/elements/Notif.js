@@ -7,7 +7,7 @@ const PopUp = (props) => {
   }, []);
 
   return ReactDOM.createPortal(
-    <div class="ui success message">
+    <div class={`ui ${props.message.split(',')[0] === "Error"? 'error' : 'success'} message`}>
       <i onClick={() => props.showPopUp(null)} class="close icon"></i>
       <div class="header" style={{ fontSize: "Raleway !important" }}>
         {props.message}
