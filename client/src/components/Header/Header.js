@@ -13,7 +13,7 @@ export default function Header() {
   }
   return (
     <section className="sec-1">
-      {msg && <PopUp message = {msg} sub="Simple, Fast and secure :)" showPopUp = {showPopUp}/>}
+      {msg && <PopUp message = {msg} sub="" showPopUp = {showPopUp}/>}
       <Wrapper padding="10rem 8rem">
         <div className="header">
           <Jumbotron
